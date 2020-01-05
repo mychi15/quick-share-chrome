@@ -1,0 +1,52 @@
+body {
+  width: 200px;
+}
+
+form {
+  text-align: center;
+}
+
+.title {
+  text-align: center;
+}
+
+.sign-out-button {
+  position: absolute;
+  right: 10px;
+  top: 14px;
+  text-decoration: none;
+  border-bottom: 1px dashed #252222;
+  color: #252222;
+}
+
+.button {
+  border: 1px solid #252222;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: #252222;
+  color: #fff;
+}
+
+form .token {
+  border: 1px solid #252222;
+  color: rgb(37, 34, 34);
+  padding: 5px 10px;
+  width: 115px;
+}
+
+form .token::placeholder {
+  color: #252222;
+}
+
+form .save-button {
+  padding: 5px 10px;
+  margin-left: 5px;
+}
+
+.share-button {
+  padding: 5px 10px;
+  margin-left: 5px;
+}
+
