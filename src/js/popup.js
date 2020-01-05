@@ -1,13 +1,16 @@
 import "../css/popup.css";
 
+const BACKEND_URL = process.env.NODE_ENV === 'production' ? "http://q.milushov.ru" : "http://localhost:3000";
+console.log('BACKEND_URL', BACKEND_URL);
+
 document.addEventListener('DOMContentLoaded', function(){
-  console.log('Loaded');
+  console.log('Extension Loaded');
 
   const $title = document.getElementById('title');
   const $signOutButton = document.getElementById('sign-out-button');
   const $form = document.getElementById('form');
   const $tokenField = document.getElementById('token');
-  const $shareButton = document.getElementById('share-button');
+  const $shareInfo = document.getElementById('share-info');
 
   chrome.storage.sync.get('token', (data) => {
     const { token } = data || {};
@@ -26,11 +29,12 @@ document.addEventListener('DOMContentLoaded', function(){
 
       chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
         const curTab = tabs[0];
-        const url = curTab.url || curTab.pendingUrl;
         const title = curTab.title;
-        console.log(url, title);
-        $shareButton.style.display = 'block';
-        $shareButton.value = `"${title.substring(0, 20)}" — Share!`;
+        const url = curTab.url || curTab.pendingUrl;
+        $shareInfo.style.display = 'block';
+        saveLinkInBackend(token, title, url, () => {
+          $shareInfo.innerHTML = `"${title.substring(0, 18)}" — Shared!`;
+        })
       });
 
     } else {
@@ -47,3 +51,23 @@ document.addEventListener('DOMContentLoaded', function(){
   })
 
 }, false);
+
+function saveLinkInBackend(token, title, url, callback) {
+  const req = new XMLHttpRequest();
+  const baseUrl = `${BACKEND_URL}/${token}`;
+  const urlParams = `title=${title}&url=${url}`;
+
+  req.timeout = 2e3;
+  req.open("POST", baseUrl, true);
+  req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  req.send(urlParams);
+
+  req.onreadystatechange = function() {
+    callback.call(this);
+    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+      console.log("Got response 200!");
+    } else {
+      console.log("Something wrong");
+    }
+  }
+}

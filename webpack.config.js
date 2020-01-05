@@ -55,7 +55,7 @@ var options = {
     // clean the build folder
     new CleanWebpackPlugin(),
     // expose and write the allowed env vars on the compiled bundle
-    new webpack.EnvironmentPlugin(["NODE_ENV"]),
+    new webpack.EnvironmentPlugin({NODE_ENV: 'development'}),
     new CopyWebpackPlugin([{
       from: "src/manifest.json",
       transform: function (content, path) {
