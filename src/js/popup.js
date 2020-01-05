@@ -2,6 +2,7 @@ import "../css/popup.css";
 
 const BACKEND_URL = process.env.NODE_ENV === 'production' ? "http://q.milushov.ru" : "http://localhost:3000";
 console.log('BACKEND_URL', BACKEND_URL);
+var isShared = false;
 
 document.addEventListener('DOMContentLoaded', function(){
   console.log('Extension Loaded');
@@ -53,8 +54,10 @@ document.addEventListener('DOMContentLoaded', function(){
 }, false);
 
 function saveLinkInBackend(token, title, url, callback) {
+  if (isShared) return;
+  isShared = true;
   const req = new XMLHttpRequest();
-  const baseUrl = `${BACKEND_URL}/${token}`;
+  const baseUrl = `${BACKEND_URL}/${token}/links`;
   const urlParams = `title=${title}&url=${url}`;
 
   req.timeout = 2e3;
@@ -63,11 +66,11 @@ function saveLinkInBackend(token, title, url, callback) {
   req.send(urlParams);
 
   req.onreadystatechange = function() {
-    callback.call(this);
-    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-      console.log("Got response 200!");
+    if (this.readyState !== XMLHttpRequest.DONE) return;
+    if (this.status === 200) {
+      callback.call(this);
     } else {
-      console.log("Something wrong");
+      console.log("Something wrong", this);
     }
   }
 }
